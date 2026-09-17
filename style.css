@@ -1,0 +1,211 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: #fff9e6;
+  color: #333;
+  line-height: 1.5;
+  padding: 16px;
+}
+
+.container {
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+header h1 {
+  color: #e65100;
+  font-size: 2.2rem;
+}
+
+#storage-status {
+  font-size: 0.85rem;
+  color: #777;
+}
+
+.card {
+  background: white;
+  padding: 16px 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  margin-bottom: 14px;
+}
+
+.card h2 {
+  font-size: 1.05rem;
+  margin-bottom: 10px;
+  color: #444;
+}
+
+/* Schalter für den Zahlenraum */
+.range-selector {
+  display: flex;
+  gap: 8px;
+}
+
+.range-btn {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid #ffd54f;
+  background-color: #fffde7;
+  color: #e65100;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.range-btn.active {
+  background-color: #ff9800;
+  color: white;
+  border-color: #e65100;
+}
+
+/* Zählhilfen */
+.visual-container {
+  min-height: 44px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.5rem;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.visual-op {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #e65100;
+}
+
+.math-question {
+  font-size: 2.8rem;
+  font-weight: bold;
+  text-align: center;
+  margin: 6px 0 16px;
+  color: #e65100;
+}
+
+/* Tastaturfeld */
+.number-pad {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.pad-btn {
+  background-color: #ffecb3;
+  border: 2px solid #ffe082;
+  border-radius: 10px;
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #e65100;
+  padding: 10px 0;
+  cursor: pointer;
+  transition: transform 0.1s ease, background-color 0.1s ease;
+  user-select: none;
+}
+
+.pad-btn:active {
+  background-color: #ffca28;
+  transform: scale(0.94);
+}
+
+.feedback-msg {
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  min-height: 30px;
+}
+
+.counter-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 6px 0;
+}
+
+#score-display {
+  font-size: 3.2rem;
+  font-weight: bold;
+  color: #ff8f00;
+}
+
+.label {
+  color: #777;
+  font-size: 0.9rem;
+}
+
+.btn {
+  display: inline-block;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: opacity 0.2s;
+}
+
+.btn:active {
+  opacity: 0.8;
+}
+
+.btn-secondary {
+  background-color: #0288d1;
+  color: white;
+}
+
+.btn-danger {
+  background-color: #e53935;
+  color: white;
+}
+
+.hint {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.file-upload {
+  position: relative;
+  overflow: hidden;
+}
+
+.file-upload input[type="file"] {
+  display: none;
+}
+
+#history-list {
+  list-style: none;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+#history-list li {
+  padding: 6px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 0.95rem;
+  display: flex;
+  justify-content: space-between;
+}

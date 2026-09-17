@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mathe-Heldin Klasse 1</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#FF9800">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Mathe-Heldin 🦁</h1>
+      <p id="storage-status">Speicherstatus: Standard</p>
+    </header>
+
+    <main>
+      <!-- Auswahl des Zahlenraums -->
+      <section class="card level-card">
+        <h2>Zahlenraum wählen:</h2>
+        <div class="range-selector">
+          <button class="range-btn active" data-max="10">Bis 10</button>
+          <button class="range-btn" data-max="15">Bis 15</button>
+          <button class="range-btn" data-max="20">Bis 20</button>
+        </div>
+      </section>
+
+      <!-- Mathe-Aufgabe mit Zähl-Hilfen -->
+      <section class="card math-card">
+        <div class="visual-container" id="visual-helpers"></div>
+        <div class="math-question" id="math-question">...</div>
+
+        <!-- Zahlentasten passen sich dem Zahlenraum an -->
+        <div class="number-pad" id="number-pad"></div>
+
+        <p id="feedback" class="feedback-msg"></p>
+      </section>
+
+      <!-- Sterne & Belohnung -->
+      <section class="card">
+        <h2>Deine Belohnungs-Sterne ⭐</h2>
+        <div class="counter-box">
+          <span id="score-display">0</span>
+          <span class="label">Sterne gesammelt</span>
+        </div>
+      </section>
+
+      <!-- Zuletzt gelöste Aufgaben -->
+      <section class="card">
+        <h2>Gelöste Aufgaben</h2>
+        <ul id="history-list"></ul>
+      </section>
+
+      <!-- Lokale Speicherung -->
+      <section class="card backup-zone">
+        <h2>Festplatten-Speicherung</h2>
+        <p class="hint" id="file-link-status">Keine Datei verknüpft.</p>
+        <div class="button-group">
+          <button id="btn-link-file" class="btn btn-secondary">📁 Datei auf Rechner wählen / anlegen</button>
+          <button id="btn-export" class="btn btn-secondary">📥 Herkömmlicher JSON-Download</button>
+          <label class="btn btn-secondary file-upload">
+            📤 Aus Datei importieren
+            <input type="file" id="import-file" accept=".json">
+          </label>
+          <button id="btn-clear" class="btn btn-danger">Sterne zurücksetzen</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
