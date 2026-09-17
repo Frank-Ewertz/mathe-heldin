@@ -24,29 +24,61 @@ header {
 
 header h1 {
   color: #e65100;
-  font-size: 2.2rem;
+  font-size: 2.3rem;
+  letter-spacing: -0.5px;
 }
 
 #storage-status {
   font-size: 0.85rem;
   color: #777;
+  margin-top: 2px;
+  margin-bottom: 14px;
 }
 
+/* Modus-Umschaltung */
+.mode-nav {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.nav-btn {
+  flex: 1;
+  padding: 12px;
+  font-size: 1.05rem;
+  font-weight: bold;
+  border-radius: 12px;
+  border: 2px solid #ffd54f;
+  background-color: #fffde7;
+  color: #e65100;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.nav-btn.active {
+  background-color: #ff9800;
+  color: white;
+  border-color: #e65100;
+  box-shadow: 0 4px 8px rgba(230, 81, 0, 0.25);
+}
+
+/* Karten */
 .card {
   background: white;
-  padding: 16px 20px;
+  padding: 18px 20px;
   border-radius: 16px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
   margin-bottom: 14px;
 }
 
 .card h2 {
-  font-size: 1.05rem;
-  margin-bottom: 10px;
+  font-size: 1.1rem;
+  margin-bottom: 12px;
   color: #444;
 }
 
-/* Schalter für den Zahlenraum */
+/* Zahlenraum */
 .range-selector {
   display: flex;
   gap: 8px;
@@ -54,15 +86,15 @@ header h1 {
 
 .range-btn {
   flex: 1;
-  padding: 10px;
+  padding: 12px;
   border: 2px solid #ffd54f;
   background-color: #fffde7;
   color: #e65100;
-  border-radius: 10px;
+  border-radius: 12px;
   font-weight: bold;
-  font-size: 1rem;
+  font-size: 1.05rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 
 .range-btn.active {
@@ -71,14 +103,14 @@ header h1 {
   border-color: #e65100;
 }
 
-/* Zählhilfen */
+/* Mathe-Aufgaben */
 .visual-container {
-  min-height: 44px;
+  min-height: 48px;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 8px;
-  font-size: 1.5rem;
+  font-size: 1.7rem;
   margin-bottom: 6px;
   flex-wrap: wrap;
 }
@@ -90,29 +122,28 @@ header h1 {
 }
 
 .math-question {
-  font-size: 2.8rem;
+  font-size: 3rem;
   font-weight: bold;
   text-align: center;
   margin: 6px 0 16px;
   color: #e65100;
 }
 
-/* Tastaturfeld */
 .number-pad {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
-  gap: 8px;
+  gap: 10px;
   margin-bottom: 12px;
 }
 
 .pad-btn {
   background-color: #ffecb3;
   border: 2px solid #ffe082;
-  border-radius: 10px;
-  font-size: 1.6rem;
+  border-radius: 12px;
+  font-size: 1.7rem;
   font-weight: bold;
   color: #e65100;
-  padding: 10px 0;
+  padding: 12px 0;
   cursor: pointer;
   transition: transform 0.1s ease, background-color 0.1s ease;
   user-select: none;
@@ -123,11 +154,111 @@ header h1 {
   transform: scale(0.94);
 }
 
+/* Silben-Bereich */
+.syllable-display {
+  text-align: center;
+  margin: 10px 0 16px;
+}
+
+.word-emoji {
+  font-size: 5rem;
+  line-height: 1.1;
+  margin-bottom: 8px;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+}
+
+.word-text {
+  font-size: 2.6rem;
+  font-weight: bold;
+  color: #e65100;
+  letter-spacing: 1px;
+}
+
+.arcs-container {
+  min-height: 80px;
+  background-color: #fffde7;
+  border: 2px dashed #ffd54f;
+  border-radius: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.syllable-arc {
+  font-size: 3.6rem;
+  line-height: 0.8;
+  color: #2e7d32;
+  font-weight: 900;
+  animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.3); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.placeholder-text {
+  color: #999;
+  font-size: 0.95rem;
+  font-style: italic;
+  text-align: center;
+}
+
+.syllable-action-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.05rem;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+  transition: opacity 0.15s, transform 0.1s;
+}
+
+.btn:active {
+  opacity: 0.85;
+  transform: scale(0.98);
+}
+
+.btn-green {
+  background-color: #4caf50;
+  color: white;
+}
+
+.btn-red {
+  background-color: #e53935;
+  color: white;
+}
+
+.btn-primary {
+  background-color: #ff9800;
+  color: white;
+}
+
+.check-btn {
+  font-size: 1.15rem;
+}
+
+/* Feedback & Zähler */
 .feedback-msg {
   text-align: center;
   font-weight: bold;
-  font-size: 1.2rem;
-  min-height: 30px;
+  font-size: 1.25rem;
+  min-height: 34px;
+  margin-top: 12px;
 }
 
 .counter-box {
@@ -138,7 +269,7 @@ header h1 {
 }
 
 #score-display {
-  font-size: 3.2rem;
+  font-size: 3.4rem;
   font-weight: bold;
   color: #ff8f00;
 }
@@ -146,54 +277,6 @@ header h1 {
 .label {
   color: #777;
   font-size: 0.9rem;
-}
-
-.btn {
-  display: inline-block;
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  text-align: center;
-  transition: opacity 0.2s;
-}
-
-.btn:active {
-  opacity: 0.8;
-}
-
-.btn-secondary {
-  background-color: #0288d1;
-  color: white;
-}
-
-.btn-danger {
-  background-color: #e53935;
-  color: white;
-}
-
-.hint {
-  font-size: 0.85rem;
-  color: #666;
-  margin-bottom: 12px;
-}
-
-.button-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.file-upload {
-  position: relative;
-  overflow: hidden;
-}
-
-.file-upload input[type="file"] {
-  display: none;
 }
 
 #history-list {
@@ -208,4 +291,25 @@ header h1 {
   font-size: 0.95rem;
   display: flex;
   justify-content: space-between;
+}
+
+/* Footer & Reset-Button */
+.app-footer {
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 24px;
+}
+
+.btn-text-reset {
+  background: none;
+  border: none;
+  color: #b0bec5;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.btn-text-reset:hover {
+  color: #e53935;
 }

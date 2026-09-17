@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mathe-Heldin Grundschule</title>
+  <title>Lern-Heldin</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#FF9800">
   <link rel="stylesheet" href="style.css">
@@ -11,61 +11,78 @@
 <body>
   <div class="container">
     <header>
-      <h1>Mathe-Heldin 🦁</h1>
+      <h1>Lern-Heldin 🦁</h1>
       <p id="storage-status">Speicherstatus: Standard</p>
+      
+      <!-- Modus-Auswahl -->
+      <nav class="mode-nav">
+        <button id="tab-math" class="nav-btn active">➕ Mathe</button>
+        <button id="tab-syllables" class="nav-btn">📖 Silben schwingen</button>
+      </nav>
     </header>
 
     <main>
-      <!-- Auswahl des Zahlenraums -->
-      <section class="card level-card">
-        <h2>Zahlenraum wählen:</h2>
-        <div class="range-selector">
-          <button class="range-btn active" data-max="10">Bis 10</button>
-          <button class="range-btn" data-max="15">Bis 15</button>
-          <button class="range-btn" data-max="20">Bis 20</button>
-        </div>
-      </section>
+      <!-- ================= 1. MATHE-BEREICH ================= -->
+      <div id="section-math" class="mode-section active">
+        <section class="card level-card">
+          <h2>Zahlenraum wählen:</h2>
+          <div class="range-selector">
+            <button class="range-btn active" data-max="10">Bis 10</button>
+            <button class="range-btn" data-max="15">Bis 15</button>
+            <button class="range-btn" data-max="20">Bis 20</button>
+          </div>
+        </section>
 
-      <!-- Mathe-Aufgabe mit Zähl-Hilfen -->
-      <section class="card math-card">
-        <div class="visual-container" id="visual-helpers"></div>
-        <div class="math-question" id="math-question">...</div>
+        <section class="card math-card">
+          <div class="visual-container" id="visual-helpers"></div>
+          <div class="math-question" id="math-question">...</div>
+          <div class="number-pad" id="number-pad"></div>
+          <p id="feedback-math" class="feedback-msg"></p>
+        </section>
+      </div>
 
-        <!-- Zahlentasten passen sich dem Zahlenraum an -->
-        <div class="number-pad" id="number-pad"></div>
+      <!-- ================= 2. SILBEN-BEREICH ================= -->
+      <div id="section-syllables" class="mode-section" style="display: none;">
+        <section class="card syllable-card">
+          <h2>Schwinge die Silben:</h2>
+          
+          <div class="syllable-display">
+            <div id="syllable-emoji" class="word-emoji">🐘</div>
+            <div id="syllable-word" class="word-text">Elefant</div>
+          </div>
 
-        <p id="feedback" class="feedback-msg"></p>
-      </section>
+          <div class="arcs-container" id="arcs-container">
+            <span class="placeholder-text">Tippe auf den grünen Knopf für jede Silbe!</span>
+          </div>
 
-      <!-- Sterne & Belohnung -->
+          <div class="syllable-action-grid">
+            <button id="btn-add-arc" class="btn btn-green">◡ Bogen setzen</button>
+            <button id="btn-remove-arc" class="btn btn-red">✕ Bogen entfernen</button>
+          </div>
+
+          <button id="btn-check-syllables" class="btn btn-primary check-btn">Antwort prüfen ✨</button>
+          <p id="feedback-syllables" class="feedback-msg"></p>
+        </section>
+      </div>
+
+      <!-- ================= GEMEINSAMER FORTSCHRITT ================= -->
       <section class="card">
         <h2>Deine Belohnungs-Sterne ⭐</h2>
         <div class="counter-box">
           <span id="score-display">0</span>
-          <span class="label">Sterne gesammelt</span>
+          <span class="label">Erfolgreich gelöste Aufgaben</span>
         </div>
       </section>
 
-      <!-- Zuletzt gelöste Aufgaben -->
       <section class="card">
-        <h2>Gelöste Aufgaben</h2>
+        <h2>Zuletzt gelöst</h2>
         <ul id="history-list"></ul>
       </section>
 
-      <!-- Lokale Speicherung -->
-      <section class="card backup-zone">
-        <h2>Festplatten-Speicherung</h2>
-        <p class="hint" id="file-link-status">Keine Datei verknüpft.</p>
-        <div class="button-group">
-          <button id="btn-link-file" class="btn btn-secondary">📁 Datei auf Rechner wählen / anlegen</button>
-          <button id="btn-export" class="btn btn-secondary">📥 Herkömmlicher JSON-Download</button>
-          <label class="btn btn-secondary file-upload">
-            📤 Aus Datei importieren
-            <input type="file" id="import-file" accept=".json">
-          </label>
-          <button id="btn-clear" class="btn btn-danger">Sterne zurücksetzen</button>
-        </div>
-      </section>
+      <!-- Dezenter Reset-Bereich für Eltern -->
+      <footer class="app-footer">
+        <button id="btn-clear" class="btn-text-reset">Sterne zurücksetzen</button>
+      </footer>
     </main>
   </div>
 
