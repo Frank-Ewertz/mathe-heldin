@@ -1,11 +1,16 @@
 // ==========================================
-// 1. Service Worker & Storage Status
+// 1. Service Worker Registrierung & Sofort-Update
 // ==========================================
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(() => console.log('Service Worker registriert'))
-      .catch(err => console.error('SW Registrierungsfehler:', err));
+  window.addEventListener('load', async () => {
+    try {
+      const reg = await navigator.serviceWorker.register('sw.js');
+      // Erzwingt bei jedem Start die Prüfung auf neue Versionen
+      reg.update();
+      console.log('Service Worker aktiv');
+    } catch (err) {
+      console.error('SW Registrierungsfehler:', err);
+    }
   });
 }
 
