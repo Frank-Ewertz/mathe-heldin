@@ -313,3 +313,128 @@ header h1 {
 .btn-text-reset:hover {
   color: #e53935;
 }
+
+/* ================= ANLAUT-ZUORDNUNG ================= */
+.anlaut-round-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-weight: bold;
+  color: #777;
+  font-size: 0.95rem;
+}
+
+.anlaut-board {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.anlaut-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.anlaut-card-btn {
+  position: relative;
+  background-color: #fffde7;
+  border: 2px solid #ffd54f;
+  border-radius: 14px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+  font-size: 2rem;
+  font-weight: bold;
+  color: #e65100;
+  min-height: 62px;
+  padding: 10px 4px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.12s ease, background-color 0.12s ease,
+    border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.anlaut-card-btn:active {
+  transform: scale(0.95);
+}
+
+.anlaut-card-btn.emoji-card {
+  font-size: 2.3rem;
+  font-weight: normal;
+  line-height: 1.2;
+}
+
+/* Auswahl: gelber Rand + sanftes Aufleuchten */
+.anlaut-card-btn.selected {
+  background-color: #ffecb3;
+  border-color: #ff9800;
+  box-shadow: 0 0 0 3px #ffd54f, 0 4px 8px rgba(230, 81, 0, 0.2);
+  transform: scale(1.04);
+}
+
+/* Richtig zugeordnet: grün + Häkchen, nicht mehr anklickbar */
+.anlaut-card-btn.matched {
+  background-color: #e8f5e9;
+  border-color: #66bb6a;
+  color: #2e7d32;
+  cursor: default;
+  transform: none;
+}
+
+.anlaut-card-btn.matched::after {
+  content: '✔️';
+  position: absolute;
+  top: 3px;
+  right: 6px;
+  font-size: 0.85rem;
+}
+
+/* Falsch: rot aufblinken + wackeln */
+.anlaut-card-btn.wrong {
+  background-color: #ffebee;
+  border-color: #e53935;
+  color: #c62828;
+  animation: anlautShake 0.45s ease;
+}
+
+@keyframes anlautShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-7px); }
+  40% { transform: translateX(7px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+
+/* Konfetti-Ebene (liegt über allem, blockiert aber keine Klicks) */
+.anlaut-confetti {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 999;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -14px;
+  border-radius: 2px;
+  opacity: 0.95;
+  animation: confettiFall linear forwards;
+}
+
+@keyframes confettiFall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 0.95; }
+  100% { transform: translateY(105vh) rotate(720deg); opacity: 0.3; }
+}
+
+/* Drei Modus-Tabs auf kleinen Bildschirmen */
+@media (max-width: 420px) {
+  .nav-btn {
+    font-size: 0.88rem;
+    padding: 10px 4px;
+  }
+}

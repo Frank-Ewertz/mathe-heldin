@@ -19,7 +19,8 @@
       <!-- Modus-Auswahl -->
       <nav class="mode-nav">
         <button id="tab-math" class="nav-btn active">➕ Mathe</button>
-        <button id="tab-syllables" class="nav-btn">📖 Silben schwingen</button>
+        <button id="tab-syllables" class="nav-btn">📖 Silben</button>
+        <button id="tab-anlaut" class="nav-btn">🔤 Anlaute</button>
       </nav>
     </header>
 
@@ -67,6 +68,25 @@
         </section>
       </div>
 
+      <!-- ================= 3. ANLAUT-BEREICH ================= -->
+      <div id="section-anlaut" class="mode-section" style="display: none;">
+        <section class="card anlaut-card">
+          <h2>Welcher Anlaut passt?</h2>
+
+          <div class="anlaut-round-info">
+            <span id="anlaut-round">Runde 1</span>
+            <span id="anlaut-progress">0 / 6 Paare</span>
+          </div>
+
+          <div class="anlaut-board">
+            <div class="anlaut-column" id="anlaut-letters"></div>
+            <div class="anlaut-column" id="anlaut-emojis"></div>
+          </div>
+
+          <p id="feedback-anlaut" class="feedback-msg" aria-live="polite"></p>
+        </section>
+      </div>
+
       <!-- ================= GEMEINSAMER FORTSCHRITT ================= -->
       <section class="card">
         <h2>Deine Belohnungs-Sterne ⭐</h2>
@@ -87,6 +107,9 @@
       </footer>
     </main>
   </div>
+
+  <!-- Konfetti-Ebene für die Anlaut-Runde -->
+  <div id="anlaut-confetti" class="anlaut-confetti"></div>
 
   <script src="app.js"></script>
 </body>
