@@ -27,6 +27,102 @@ async function requestPersistentStorage() {
 requestPersistentStorage();
 
 // ==========================================
+// 1b. TON & SPRACHE (mit Mute-Schalter)
+// ==========================================
+// Kurze synthetisierte Töne (Web Audio API, offline-fähig) und optionale
+// Sprach-Ausgabe (speechSynthesis) für die Wort-Bilder. Alles über den
+// 🔊-Knopf im Kopfbereich ein-/ausschaltbar (dauerhaft gespeichert).
+let soundEnabled = true;
+
+const soundBtnEl = document.getElementById('btn-sound');
+
+function initSoundPreference() {
+  try {
+    if (localStorage.getItem('lernHeldinSound') === 'off') soundEnabled = false;
+  } catch (err) {
+    /* localStorage evtl. nicht verfügbar */
+  }
+  updateSoundButton();
+}
+
+function updateSoundButton() {
+  soundBtnEl.textContent = soundEnabled ? '🔊' : '🔇';
+  soundBtnEl.setAttribute('aria-pressed', String(soundEnabled));
+  soundBtnEl.classList.toggle('off', !soundEnabled);
+}
+
+soundBtnEl.addEventListener('click', () => {
+  soundEnabled = !soundEnabled;
+  try {
+    localStorage.setItem('lernHeldinSound', soundEnabled ? 'on' : 'off');
+  } catch (err) {
+    /* localStorage evtl. nicht verfügbar */
+  }
+  updateSoundButton();
+  if (soundEnabled) playSuccessSound();
+});
+
+let audioCtx = null;
+
+function getAudioContext() {
+  const AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextConstructor) return null;
+  if (!audioCtx) audioCtx = new AudioContextConstructor();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function playTone(frequency, startDelay, duration, type, volume) {
+  if (!soundEnabled) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type || 'sine';
+  osc.frequency.value = frequency;
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  const start = ctx.currentTime + startDelay;
+  gain.gain.setValueAtTime(0.0001, start);
+  gain.gain.exponentialRampToValueAtTime(volume || 0.18, start + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+  osc.start(start);
+  osc.stop(start + duration + 0.05);
+}
+
+function playSuccessSound() {
+  playTone(523.25, 0, 0.12);    // C5
+  playTone(659.25, 0.09, 0.14); // E5
+  playTone(783.99, 0.18, 0.2);  // G5
+}
+
+function playErrorSound() {
+  playTone(196, 0, 0.2, 'triangle', 0.14);        // G3
+  playTone(155.56, 0.12, 0.28, 'triangle', 0.14); // Es3
+}
+
+function playFanfareSound() {
+  playTone(523.25, 0, 0.12);    // C5
+  playTone(659.25, 0.1, 0.12);  // E5
+  playTone(783.99, 0.2, 0.12);  // G5
+  playTone(1046.5, 0.3, 0.35);  // C6
+}
+
+function speakWord(text) {
+  if (!soundEnabled || !('speechSynthesis' in window)) return;
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'de-DE';
+  utterance.rate = 0.85;
+  utterance.pitch = 1.05;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utterance);
+}
+
+initSoundPreference();
+
+// ==========================================
 // 2. Automatischer interner Speicher (IndexedDB)
 // ==========================================
 const DB_NAME = 'LernAppDB';
@@ -152,15 +248,47 @@ function generateNewTask() {
   }
 
   document.getElementById('math-question').textContent = currentTask.questionText;
+
+  // Anschauliche Darstellung: Bei 0 Äpfeln ein gestrichelter Platzhalter,
+  // bei Subtraktion werden die abzuziehenden Äpfel durchgestrichen
+  // (statt eines Text-Hinweises, den Erstklässler noch nicht lesen können).
   const visualEl = document.getElementById('visual-helpers');
+  visualEl.innerHTML = '';
+
   if (currentTask.op === '+') {
-    const applesA = '🍎'.repeat(currentTask.a);
-    const applesB = '🍏'.repeat(currentTask.b);
-    visualEl.innerHTML = `<span>${applesA || '0'}</span> <span class="visual-op">+</span> <span>${applesB || '0'}</span>`;
+    visualEl.appendChild(buildAppleGroup(currentTask.a, 0, '🍎'));
+    const plus = document.createElement('span');
+    plus.className = 'visual-op';
+    plus.textContent = '+';
+    visualEl.appendChild(plus);
+    visualEl.appendChild(buildAppleGroup(currentTask.b, 0, '🍏'));
   } else {
-    const applesA = '🍎'.repeat(currentTask.a);
-    visualEl.innerHTML = `<span>${applesA}</span> <span class="visual-op"> (ziehe ${currentTask.b} ab)</span>`;
+    visualEl.appendChild(buildAppleGroup(currentTask.a, currentTask.b, '🍎'));
   }
+}
+
+// Erstellt eine Apfel-Gruppe; die letzten "crossLast" Äpfel werden
+// durchgestrichen (Subtraktion). Bei 0 Äpfeln: gestrichelter Platzhalter.
+function buildAppleGroup(count, crossLast, emoji) {
+  const group = document.createElement('span');
+  group.className = 'visual-group';
+
+  if (count === 0) {
+    const empty = document.createElement('span');
+    empty.className = 'visual-empty';
+    group.appendChild(empty);
+    return group;
+  }
+
+  for (let i = 0; i < count; i++) {
+    const apple = document.createElement('span');
+    apple.textContent = emoji;
+    if (i >= count - crossLast) {
+      apple.classList.add('apple-crossed');
+    }
+    group.appendChild(apple);
+  }
+  return group;
 }
 
 document.querySelectorAll('.range-btn').forEach((btn) => {
@@ -181,6 +309,7 @@ document.getElementById('number-pad').addEventListener('click', async (e) => {
 
   if (chosenNumber === currentTask.correctAnswer) {
     mathLocked = true;
+    playSuccessSound();
     feedbackMath.textContent = '🌟 Richtig! Tolle Leistung!';
     feedbackMath.style.color = '#2e7d32';
 
@@ -194,6 +323,7 @@ document.getElementById('number-pad').addEventListener('click', async (e) => {
       generateNewTask();
     }, 1000);
   } else {
+    playErrorSound();
     feedbackMath.textContent = '🤔 Zähle noch einmal nach!';
     feedbackMath.style.color = '#d32f2f';
   }
@@ -378,6 +508,7 @@ document.getElementById('btn-check-syllables').addEventListener('click', async (
 
   if (currentArcCount === currentWord.syllables) {
     syllablesLocked = true;
+    playSuccessSound();
     feedbackSyllables.textContent = `🎉 Perfekt! "${currentWord.word}" hat genau ${currentWord.syllables} Silben!`;
     feedbackSyllables.style.color = '#2e7d32';
 
@@ -390,6 +521,7 @@ document.getElementById('btn-check-syllables').addEventListener('click', async (
       generateNewWord();
     }, 1400);
   } else {
+    playErrorSound();
     feedbackSyllables.textContent = `🤔 Fast! Klatsche das Wort noch einmal langsam!`;
     feedbackSyllables.style.color = '#d32f2f';
   }
@@ -513,7 +645,7 @@ const ANLAUT_DATA = [
   { letter: 'N', emoji: '🍝', word: 'Nudeln' },
   { letter: 'N', emoji: '🌰', word: 'Nuss' },
   { letter: 'N', emoji: '👃', word: 'Nase' },
-  { letter: 'N', emoji: '🪹', word: 'Nest' },
+  { letter: 'N', emoji: '🦏', word: 'Nashorn' },
   // O
   { letter: 'O', emoji: '👵', word: 'Oma' },
   { letter: 'O', emoji: '👴', word: 'Opa' },
@@ -531,7 +663,7 @@ const ANLAUT_DATA = [
   { letter: 'P', emoji: '👮', word: 'Polizist' },
   { letter: 'P', emoji: '🥞', word: 'Pfannkuchen' },
   // Q
-  { letter: 'Q', emoji: '🪼', word: 'Qualle' },
+  { letter: 'Q', emoji: '🥣', word: 'Quark' },
   // R
   { letter: 'R', emoji: '🚀', word: 'Rakete' },
   { letter: 'R', emoji: '🌹', word: 'Rose' },
@@ -598,6 +730,7 @@ const anlautLettersEl = document.getElementById('anlaut-letters');
 const anlautEmojisEl = document.getElementById('anlaut-emojis');
 const anlautRoundEl = document.getElementById('anlaut-round');
 const anlautProgressEl = document.getElementById('anlaut-progress');
+const anlautStarsEl = document.getElementById('anlaut-progress-stars');
 const feedbackAnlaut = document.getElementById('feedback-anlaut');
 const anlautConfettiEl = document.getElementById('anlaut-confetti');
 
@@ -661,6 +794,7 @@ function renderAnlautBoard() {
 
   anlautRoundEl.textContent = `Runde ${anlautRoundNo}`;
   anlautProgressEl.textContent = `0 / ${ANLAUT_PAIRS_PER_ROUND} Paare`;
+  renderProgressStars(anlautStarsEl, ANLAUT_PAIRS_PER_ROUND, 0);
 }
 
 function startAnlautRound() {
@@ -708,6 +842,10 @@ anlautLettersEl.addEventListener('click', (e) => {
   clearAnlautSelection();
   card.classList.add('selected');
   anlautSelectedCard = card;
+
+  // Buchstaben beim Wählen vorlesen (Laut-Verbindung stärken)
+  const selectedPair = anlautRoundPairs[parseInt(card.dataset.pairId, 10)];
+  speakWord(selectedPair.letter);
 });
 
 // Emoji antippen -> prüfen
@@ -716,7 +854,10 @@ anlautEmojisEl.addEventListener('click', async (e) => {
   if (!emojiCard || anlautLocked || emojiCard.classList.contains('matched')) return;
 
   if (!anlautSelectedCard) {
-    feedbackAnlaut.textContent = '👆 Tippe zuerst auf einen Buchstaben!';
+    // Ohne Auswahl: Wort vorlesen, damit das Kind es hören kann
+    const heardPair = anlautRoundPairs[parseInt(emojiCard.dataset.pairId, 10)];
+    speakWord(heardPair.word);
+    feedbackAnlaut.textContent = '👆 Jetzt den passenden Buchstaben antippen!';
     feedbackAnlaut.style.color = '#e65100';
     return;
   }
@@ -730,9 +871,11 @@ anlautEmojisEl.addEventListener('click', async (e) => {
     clearAnlautSelection();
     anlautMatchedCount++;
 
+    playSuccessSound();
     feedbackAnlaut.textContent = `✅ ${pair.word} beginnt mit ${pair.letter}!`;
     feedbackAnlaut.style.color = '#2e7d32';
     anlautProgressEl.textContent = `${anlautMatchedCount} / ${ANLAUT_PAIRS_PER_ROUND} Paare`;
+    renderProgressStars(anlautStarsEl, ANLAUT_PAIRS_PER_ROUND, anlautMatchedCount);
 
     await addEntry(`Anlaut: ${pair.word} → ${pair.letter} ⭐`);
     renderUI();
@@ -741,6 +884,7 @@ anlautEmojisEl.addEventListener('click', async (e) => {
       // Runde geschafft: Konfetti + nach 3 Sekunden neue Runde
       anlautLocked = true;
       showConfetti();
+      playFanfareSound();
       feedbackAnlaut.textContent = '🎉 Super! Alle Paare richtig geschafft!';
       feedbackAnlaut.style.color = '#2e7d32';
 
@@ -753,7 +897,9 @@ anlautEmojisEl.addEventListener('click', async (e) => {
     // FALSCH: rot aufblinken, wackeln, Auswahl zurücksetzen
     anlautLocked = true;
     const letterCard = anlautSelectedCard;
+    letterCard.dataset.tries = String((parseInt(letterCard.dataset.tries || '0', 10)) + 1);
 
+    playErrorSound();
     emojiCard.classList.add('wrong');
     letterCard.classList.add('wrong');
 
@@ -765,6 +911,20 @@ anlautEmojisEl.addEventListener('click', async (e) => {
       letterCard.classList.remove('wrong');
       clearAnlautSelection();
       anlautLocked = false;
+
+      // Anti-Frust-Hilfe: nach 3 Fehlversuchen die richtige Karte aufleuchten
+      if (parseInt(letterCard.dataset.tries, 10) >= 3) {
+        letterCard.dataset.tries = '0';
+        const hintCard = anlautEmojisEl.querySelector(
+          `.anlaut-card-btn[data-pair-id="${letterCard.dataset.pairId}"]:not(.matched)`
+        );
+        if (hintCard) {
+          const hintPair = anlautRoundPairs[parseInt(hintCard.dataset.pairId, 10)];
+          speakWord(hintPair.word);
+          hintCard.classList.add('hint-glow');
+          setTimeout(() => hintCard.classList.remove('hint-glow'), 1700);
+        }
+      }
     }, 600);
   }
 });
@@ -779,7 +939,7 @@ const FILL_DATA = [
   { emoji: '🍌', word: 'Banane', base: 'B', syllables: ['Ba', 'Be', 'Bi', 'Bo', 'Bu'], correct: 'Ba' },
   { emoji: '🛏️', word: 'Bett', base: 'B', syllables: ['Ba', 'Be', 'Bi', 'Bo', 'Bu'], correct: 'Be' },
   { emoji: '🐝', word: 'Biene', base: 'B', syllables: ['Ba', 'Be', 'Bi', 'Bo', 'Bu'], correct: 'Bi' },
-  { emoji: '🫘', word: 'Bohne', base: 'B', syllables: ['Ba', 'Be', 'Bi', 'Bo', 'Bu'], correct: 'Bo' },
+  { emoji: '⛵', word: 'Boot', base: 'B', syllables: ['Ba', 'Be', 'Bi', 'Bo', 'Bu'], correct: 'Bo' },
   { emoji: '📚', word: 'Buch', base: 'B', syllables: ['Ba', 'Be', 'Bi', 'Bo', 'Bu'], correct: 'Bu' },
 
   // D-Silben
@@ -833,7 +993,7 @@ const FILL_DATA = [
 
   // N-Silben
   { emoji: '👃', word: 'Nase', base: 'N', syllables: ['Na', 'Ne', 'Ni', 'No', 'Nu'], correct: 'Na' },
-  { emoji: '🪹', word: 'Nest', base: 'N', syllables: ['Na', 'Ne', 'Ni', 'No', 'Nu'], correct: 'Ne' },
+  { emoji: '🦏', word: 'Nashorn', base: 'N', syllables: ['Na', 'Ne', 'Ni', 'No', 'Nu'], correct: 'Na' },
   { emoji: '🦛', word: 'Nilpferd', base: 'N', syllables: ['Na', 'Ne', 'Ni', 'No', 'Nu'], correct: 'Ni' },
   { emoji: '🎵', word: 'Note', base: 'N', syllables: ['Na', 'Ne', 'Ni', 'No', 'Nu'], correct: 'No' },
   { emoji: '🍝', word: 'Nudel', base: 'N', syllables: ['Na', 'Ne', 'Ni', 'No', 'Nu'], correct: 'Nu' },
@@ -893,6 +1053,7 @@ const FILL_MAX_ROWS = 5;
 const fillBoardEl = document.getElementById('fill-board');
 const fillRoundEl = document.getElementById('fill-round');
 const fillProgressEl = document.getElementById('fill-progress');
+const fillStarsEl = document.getElementById('fill-progress-stars');
 const feedbackFill = document.getElementById('feedback-fill');
 
 let fillRoundRows = [];
@@ -963,6 +1124,7 @@ function renderFillBoard() {
 
   fillRoundEl.textContent = `Runde ${fillRoundNo}`;
   fillProgressEl.textContent = `0 / ${fillRoundRows.length} Zeilen`;
+  renderProgressStars(fillStarsEl, fillRoundRows.length, 0);
 }
 
 function startFillRound() {
@@ -975,6 +1137,16 @@ function startFillRound() {
 
 // Silben-Kästchen antippen -> ausmalen & prüfen
 fillBoardEl.addEventListener('click', async (e) => {
+  // Bild antippen: Wort vorlesen (Hör-Hilfe)
+  const emojiEl = e.target.closest('.fill-emoji');
+  if (emojiEl) {
+    const emojiRow = emojiEl.closest('.fill-row');
+    if (emojiRow && !emojiRow.classList.contains('solved')) {
+      speakWord(fillRoundRows[parseInt(emojiRow.dataset.index, 10)].word);
+    }
+    return;
+  }
+
   const box = e.target.closest('.fill-box');
   if (!box || fillLocked) return;
 
@@ -991,9 +1163,11 @@ fillBoardEl.addEventListener('click', async (e) => {
     box.classList.add('state-correct');
     fillSolvedCount++;
 
+    playSuccessSound();
     feedbackFill.textContent = `✅ ${entry.word} beginnt mit ${entry.correct}!`;
     feedbackFill.style.color = '#2e7d32';
     fillProgressEl.textContent = `${fillSolvedCount} / ${fillRoundRows.length} Zeilen`;
+    renderProgressStars(fillStarsEl, fillRoundRows.length, fillSolvedCount);
 
     await addEntry(`Anfangssilbe: ${entry.word} → ${entry.correct} ⭐`);
     renderUI();
@@ -1002,6 +1176,7 @@ fillBoardEl.addEventListener('click', async (e) => {
       // Runde geschafft: Konfetti + nach 3 Sekunden neue Runde
       fillLocked = true;
       showConfetti();
+      playFanfareSound();
       feedbackFill.textContent = '🎉 Super! Alle Silben richtig ausgemalt!';
       feedbackFill.style.color = '#2e7d32';
 
@@ -1013,17 +1188,99 @@ fillBoardEl.addEventListener('click', async (e) => {
   } else {
     // FALSCH: Kästchen füllt sich kurz rot, wackelt und wird wieder weiß
     row.dataset.rowLocked = 'true';
+    row.dataset.tries = String((parseInt(row.dataset.tries || '0', 10)) + 1);
     box.classList.add('state-wrong');
 
+    playErrorSound();
     feedbackFill.textContent = '🤔 Sprich das Wort noch einmal langsam!';
     feedbackFill.style.color = '#d32f2f';
 
     setTimeout(() => {
       box.classList.remove('state-wrong');
       row.dataset.rowLocked = 'false';
+
+      // Anti-Frust-Hilfe: nach 3 Fehlversuchen die richtige Silbe aufleuchten
+      if (parseInt(row.dataset.tries, 10) >= 3) {
+        row.dataset.tries = '0';
+        const hintBox = row.querySelector(`.fill-box[data-syllable="${entry.correct}"]`);
+        if (hintBox) {
+          speakWord(entry.word);
+          hintBox.classList.add('hint-glow');
+          setTimeout(() => hintBox.classList.remove('hint-glow'), 1700);
+        }
+      }
     }, 700);
   }
 });
+
+// ==========================================
+// 6e. GEMEINSAME HILFEN: FORTSCHRITTS-STERNE & MEILENSTEINE
+// ==========================================
+function renderProgressStars(containerEl, total, current) {
+  if (!containerEl) return;
+  containerEl.innerHTML = '';
+  for (let i = 0; i < total; i++) {
+    const star = document.createElement('span');
+    star.className = 'p-star' + (i < current ? ' lit' : '');
+    star.textContent = '★';
+    containerEl.appendChild(star);
+  }
+}
+
+const MILESTONES = [
+  { stars: 10, emoji: '🌟', title: 'Sterne-Sammlerin!', text: 'Du hast schon 10 Aufgaben gelöst!' },
+  { stars: 25, emoji: '🦊', title: 'Rechen-Fuchs!', text: '25 Sterne – richtig stark!' },
+  { stars: 50, emoji: '🚀', title: 'Lern-Rakete!', text: '50 Sterne – du fliegst ab!' },
+  { stars: 100, emoji: '🏆', title: 'Lern-Champion!', text: '100 Sterne – unglaublich!' },
+  { stars: 200, emoji: '👑', title: 'Lern-Königin!', text: '200 Sterne – legendär!' }
+];
+
+let shownMilestones = new Set();
+
+function loadShownMilestones() {
+  try {
+    const raw = localStorage.getItem('lernHeldinMilestones');
+    if (raw) return new Set(JSON.parse(raw));
+  } catch (err) {
+    /* localStorage evtl. nicht verfügbar */
+  }
+  return new Set();
+}
+
+function saveShownMilestones() {
+  try {
+    localStorage.setItem('lernHeldinMilestones', JSON.stringify([...shownMilestones]));
+  } catch (err) {
+    /* localStorage evtl. nicht verfügbar */
+  }
+}
+
+function showMilestoneBanner(milestone) {
+  const banner = document.getElementById('milestone-banner');
+  document.getElementById('milestone-emoji').textContent = milestone.emoji;
+  document.getElementById('milestone-title').textContent = milestone.title;
+  document.getElementById('milestone-text').textContent = milestone.text;
+
+  playFanfareSound();
+  banner.classList.add('show');
+  setTimeout(() => banner.classList.remove('show'), 3500);
+}
+
+function checkMilestone(totalStars) {
+  let newest = null;
+  for (const m of MILESTONES) {
+    if (totalStars >= m.stars && !shownMilestones.has(m.stars)) {
+      shownMilestones.add(m.stars);
+      newest = m;
+    }
+  }
+  if (newest) {
+    saveShownMilestones();
+    showMilestoneBanner(newest);
+  }
+}
+
+shownMilestones = loadShownMilestones();
 
 // ==========================================
 // 7. UI & RESET
@@ -1036,23 +1293,44 @@ const MAX_HISTORY_ENTRIES = 50;
 async function renderUI() {
   const entries = await getAllEntries();
   scoreDisplay.textContent = entries.length;
+  checkMilestone(entries.length);
   historyList.innerHTML = '';
 
   // Nur die letzten Einträge anzeigen (Sterne-Zähler zählt weiterhin alles)
   const reversed = [...entries].reverse().slice(0, MAX_HISTORY_ENTRIES);
   for (const entry of reversed) {
     const li = document.createElement('li');
-    const dateStr = new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const dateStr = new Date(entry.timestamp).toLocaleString([], {
+      weekday: 'short',
+      day: '2-digit',
+      month: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
     li.innerHTML = `<span>${entry.title}</span> <span>${dateStr}</span>`;
     historyList.appendChild(li);
   }
 }
 
-document.getElementById('btn-clear').addEventListener('click', async () => {
-  if (confirm('Möchtest du wirklich alle gesammelten Sterne zurücksetzen?')) {
-    await clearEntries();
-    renderUI();
-  }
+const resetDialogEl = document.getElementById('reset-dialog');
+
+document.getElementById('btn-clear').addEventListener('click', () => {
+  resetDialogEl.classList.add('open');
+});
+
+document.getElementById('btn-reset-cancel').addEventListener('click', () => {
+  resetDialogEl.classList.remove('open');
+});
+
+document.getElementById('btn-reset-confirm').addEventListener('click', async () => {
+  resetDialogEl.classList.remove('open');
+  await clearEntries();
+  renderUI();
+});
+
+// Klick auf den abgedunkelten Hintergrund schließt den Dialog ebenfalls
+resetDialogEl.addEventListener('click', (e) => {
+  if (e.target === resetDialogEl) resetDialogEl.classList.remove('open');
 });
 
 // Starten

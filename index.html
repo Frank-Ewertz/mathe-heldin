@@ -2,19 +2,25 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Lern-Heldin</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" href="icon-192.png">
   <link rel="apple-touch-icon" href="icon-192.png">
   <meta name="theme-color" content="#FF9800">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Lern-Heldin">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
     <header>
       <h1>Lern-Heldin 🦁</h1>
-      <p id="storage-status">Speicherstatus: Standard</p>
+      <div class="status-row">
+        <p id="storage-status">Speicherstatus: Standard</p>
+        <button id="btn-sound" class="sound-btn" aria-pressed="true" aria-label="Töne und Sprache an- oder ausschalten">🔊</button>
+      </div>
       
       <!-- Modus-Auswahl -->
       <nav class="mode-nav">
@@ -73,11 +79,14 @@
       <div id="section-anlaut" class="mode-section" style="display: none;">
         <section class="card anlaut-card">
           <h2>Welcher Anlaut passt?</h2>
+          <p class="exercise-hint">Tippe die Bilder an, um die Wörter zu hören!</p>
 
           <div class="anlaut-round-info">
             <span id="anlaut-round">Runde 1</span>
             <span id="anlaut-progress">0 / 6 Paare</span>
           </div>
+
+          <div class="progress-stars" id="anlaut-progress-stars"></div>
 
           <div class="anlaut-board">
             <div class="anlaut-column" id="anlaut-letters"></div>
@@ -92,11 +101,14 @@
       <div id="section-fill" class="mode-section" style="display: none;">
         <section class="card fill-card">
           <h2>Male die passende Silbe an!</h2>
+          <p class="exercise-hint">Tippe auf das Bild, um das Wort zu hören!</p>
 
           <div class="fill-round-info">
             <span id="fill-round">Runde 1</span>
             <span id="fill-progress">0 / 4 Zeilen</span>
           </div>
+
+          <div class="progress-stars" id="fill-progress-stars"></div>
 
           <div id="fill-board"></div>
 
@@ -125,8 +137,28 @@
     </main>
   </div>
 
-  <!-- Konfetti-Ebene für die Anlaut-Runde -->
+  <!-- Konfetti-Ebene für die Runden-Belohnung -->
   <div id="anlaut-confetti" class="anlaut-confetti"></div>
+
+  <!-- Meilenstein-Banner (Sterne-Erfolge) -->
+  <div id="milestone-banner" class="milestone-banner" role="status" aria-live="polite">
+    <div class="m-emoji" id="milestone-emoji">🏆</div>
+    <div class="m-title" id="milestone-title"></div>
+    <div class="m-text" id="milestone-text"></div>
+  </div>
+
+  <!-- Rückfrage-Dialog für den Sternen-Reset -->
+  <div id="reset-dialog" class="dialog-overlay" role="dialog" aria-modal="true"
+       aria-labelledby="reset-dialog-title" aria-describedby="reset-dialog-text">
+    <div class="dialog-box">
+      <h3 id="reset-dialog-title">Sterne zurücksetzen?</h3>
+      <p id="reset-dialog-text">Möchtest du wirklich alle gesammelten Sterne zurücksetzen?</p>
+      <div class="dialog-actions">
+        <button id="btn-reset-cancel" class="btn btn-green">Nein, behalten</button>
+        <button id="btn-reset-confirm" class="btn btn-red">Ja, zurücksetzen</button>
+      </div>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>

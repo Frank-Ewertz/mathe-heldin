@@ -9,7 +9,8 @@ body {
   background-color: #fff9e6;
   color: #333;
   line-height: 1.5;
-  padding: 16px;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
 }
 
 .container {
@@ -30,9 +31,9 @@ header h1 {
 
 #storage-status {
   font-size: 0.85rem;
-  color: #777;
+  color: #6b6b6b;
   margin-top: 2px;
-  margin-bottom: 14px;
+  margin-bottom: 0;
 }
 
 /* Modus-Umschaltung */
@@ -201,7 +202,7 @@ header h1 {
 }
 
 .placeholder-text {
-  color: #999;
+  color: #767676;
   font-size: 0.95rem;
   font-style: italic;
   text-align: center;
@@ -275,7 +276,7 @@ header h1 {
 }
 
 .label {
-  color: #777;
+  color: #6b6b6b;
   font-size: 0.9rem;
 }
 
@@ -303,7 +304,7 @@ header h1 {
 .btn-text-reset {
   background: none;
   border: none;
-  color: #b0bec5;
+  color: #8a9299;
   font-size: 0.85rem;
   text-decoration: underline;
   cursor: pointer;
@@ -321,7 +322,7 @@ header h1 {
   align-items: center;
   margin-bottom: 12px;
   font-weight: bold;
-  color: #777;
+  color: #6b6b6b;
   font-size: 0.95rem;
 }
 
@@ -438,7 +439,7 @@ header h1 {
   align-items: center;
   margin-bottom: 12px;
   font-weight: bold;
-  color: #777;
+  color: #6b6b6b;
   font-size: 0.95rem;
 }
 
@@ -577,5 +578,217 @@ header h1 {
   .fill-box {
     font-size: 1.05rem;
     padding: 10px 2px;
+  }
+}
+
+/* ================= UX-VERBESSERUNGEN ================= */
+
+/* Statuszeile mit Ton-Schalter */
+.status-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 2px 0 14px;
+}
+
+.sound-btn {
+  background-color: #fffde7;
+  border: 2px solid #ffd54f;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.15rem;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.sound-btn.off {
+  opacity: 0.55;
+}
+
+/* Kleine Übungs-Hinweise unter den Überschriften */
+.exercise-hint {
+  font-size: 0.85rem;
+  color: #6b6b6b;
+  text-align: center;
+  margin: -6px 0 12px;
+}
+
+/* Fortschritts-Sterne pro Runde */
+.progress-stars {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  min-height: 24px;
+  margin-bottom: 12px;
+}
+
+.progress-stars .p-star {
+  font-size: 1.3rem;
+  color: #cfcfcf;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.progress-stars .p-star.lit {
+  color: #ffb300;
+  transform: scale(1.18);
+}
+
+/* Anti-Frust-Hilfe: richtige Lösung leuchtet kurz auf */
+.anlaut-card-btn.hint-glow {
+  background-color: #e8f5e9;
+  border-color: #4caf50;
+  animation: hintPulse 0.85s ease-in-out 2;
+}
+
+.fill-box.hint-glow {
+  border-color: #66bb6a;
+  animation: hintPulse 0.85s ease-in-out 2;
+}
+
+@keyframes hintPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+  50% { box-shadow: 0 0 0 7px rgba(76, 175, 80, 0.5); }
+}
+
+/* Mathe: durchgestrichene Äpfel bei Subtraktion + leerer Platzhalter */
+.visual-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px;
+  max-width: 100%;
+}
+
+.apple-crossed {
+  position: relative;
+  opacity: 0.45;
+  filter: grayscale(0.6);
+}
+
+.apple-crossed::after {
+  content: '';
+  position: absolute;
+  left: -3px;
+  right: -3px;
+  top: 48%;
+  border-top: 3px solid #d32f2f;
+  transform: rotate(-15deg);
+}
+
+.visual-empty {
+  display: inline-block;
+  min-width: 1.6em;
+  border-bottom: 3px dashed #ffcc80;
+}
+
+/* Rückfrage-Dialog (ersetzt den nativen confirm-Dialog) */
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.dialog-overlay.open {
+  display: flex;
+}
+
+.dialog-box {
+  background: white;
+  border-radius: 16px;
+  padding: 24px 22px;
+  max-width: 340px;
+  width: 100%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  text-align: center;
+}
+
+.dialog-box h3 {
+  color: #e65100;
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+}
+
+.dialog-box p {
+  color: #555;
+  margin-bottom: 18px;
+}
+
+.dialog-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* Meilenstein-Banner ("Rechen-Fuchs" etc.) */
+.milestone-banner {
+  position: fixed;
+  left: 50%;
+  top: 18%;
+  transform: translateX(-50%) scale(0.6);
+  background: white;
+  border: 3px solid #ffb300;
+  border-radius: 18px;
+  padding: 18px 28px;
+  text-align: center;
+  z-index: 1001;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease,
+    transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.4);
+}
+
+.milestone-banner.show {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+
+.milestone-banner .m-emoji {
+  font-size: 3rem;
+  line-height: 1.1;
+}
+
+.milestone-banner .m-title {
+  font-weight: bold;
+  font-size: 1.25rem;
+  color: #e65100;
+  margin-top: 4px;
+}
+
+.milestone-banner .m-text {
+  color: #6b6b6b;
+  font-size: 0.95rem;
+  margin-top: 2px;
+}
+
+/* Doppeltipp-Zoom auf Buttons verhindern */
+.nav-btn,
+.range-btn,
+.pad-btn,
+.btn,
+.btn-text-reset,
+.sound-btn,
+.anlaut-card-btn,
+.fill-box {
+  touch-action: manipulation;
+}
+
+/* Bewegungsreduzierung respektieren (Konfetti, Shake etc.) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
