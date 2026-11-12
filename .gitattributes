@@ -1,0 +1,5 @@
+# Zeilenenden vereinheitlichen: Textdateien im Repository als LF speichern
+* text=auto
+
+# Binärdateien nie konvertieren
+*.png binary

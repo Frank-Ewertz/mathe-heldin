@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lern-Heldin</title>
   <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
   <meta name="theme-color" content="#FF9800">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -37,7 +39,7 @@
           <div class="visual-container" id="visual-helpers"></div>
           <div class="math-question" id="math-question">...</div>
           <div class="number-pad" id="number-pad"></div>
-          <p id="feedback-math" class="feedback-msg"></p>
+          <p id="feedback-math" class="feedback-msg" aria-live="polite"></p>
         </section>
       </div>
 
@@ -61,7 +63,7 @@
           </div>
 
           <button id="btn-check-syllables" class="btn btn-primary check-btn">Antwort prüfen ✨</button>
-          <p id="feedback-syllables" class="feedback-msg"></p>
+          <p id="feedback-syllables" class="feedback-msg" aria-live="polite"></p>
         </section>
       </div>
 

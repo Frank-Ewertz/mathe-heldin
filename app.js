@@ -113,6 +113,7 @@ tabSyllables.addEventListener('click', () => {
 // ==========================================
 let currentMaxNumber = 10;
 let currentTask = { questionText: '', correctAnswer: 0, a: 0, b: 0, op: '+' };
+let mathLocked = false; // verhindert Doppel-Sterne durch mehrfaches Klicken
 const feedbackMath = document.getElementById('feedback-math');
 
 function buildNumberPad() {
@@ -176,10 +177,12 @@ document.querySelectorAll('.range-btn').forEach((btn) => {
 
 document.getElementById('number-pad').addEventListener('click', async (e) => {
   if (!e.target.classList.contains('pad-btn')) return;
+  if (mathLocked) return;
 
   const chosenNumber = parseInt(e.target.getAttribute('data-val'), 10);
 
   if (chosenNumber === currentTask.correctAnswer) {
+    mathLocked = true;
     feedbackMath.textContent = '🌟 Richtig! Tolle Leistung!';
     feedbackMath.style.color = '#2e7d32';
 
@@ -188,6 +191,7 @@ document.getElementById('number-pad').addEventListener('click', async (e) => {
     renderUI();
 
     setTimeout(() => {
+      mathLocked = false;
       feedbackMath.textContent = '';
       generateNewTask();
     }, 1000);
@@ -237,7 +241,6 @@ const SYLLABLE_WORDS = [
   { word: 'Birne', emoji: '🍐', syllables: 2 },
   { word: 'Kirsche', emoji: '🍒', syllables: 2 },
   { word: 'Zitrone', emoji: '🍋', syllables: 2 },
-  { word: 'Erdbeere', emoji: '🍓', syllables: 2 },
   { word: 'Hase', emoji: '🐰', syllables: 2 },
   { word: 'Löwe', emoji: '🦁', syllables: 2 },
   { word: 'Tiger', emoji: '🐯', syllables: 2 },
@@ -284,7 +287,6 @@ const SYLLABLE_WORDS = [
   { word: 'Tomate', emoji: '🍅', syllables: 3 },
   { word: 'Karotte', emoji: '🥕', syllables: 3 },
   { word: 'Krokodil', emoji: '🐊', syllables: 3 },
-  { word: 'Dinosaurier', emoji: '🦖', syllables: 4 },
   { word: 'Papagei', emoji: '🦜', syllables: 3 },
   { word: 'Flamingo', emoji: '🦩', syllables: 3 },
   { word: 'Gorilla', emoji: '🦍', syllables: 3 },
@@ -303,7 +305,9 @@ const SYLLABLE_WORDS = [
   { word: 'Geschenkkorb', emoji: '🎁', syllables: 3 },
   { word: 'Schultüte', emoji: '🎒', syllables: 3 },
   { word: 'Kleeblatt', emoji: '☘️', syllables: 2 },
-  { word: 'Marienkäfer', emoji: '🐞', syllables: 5 },
+  { word: 'Erdbeere', emoji: '🍓', syllables: 3 },
+  { word: 'Prinzessin', emoji: '👸', syllables: 3 },
+  { word: 'Ritterburg', emoji: '🏰', syllables: 3 },
 
   // 4 & 5 Silben
   { word: 'Schokolade', emoji: '🍫', syllables: 4 },
@@ -311,12 +315,13 @@ const SYLLABLE_WORDS = [
   { word: 'Lokomotive', emoji: '🚂', syllables: 5 },
   { word: 'Avocado', emoji: '🥑', syllables: 4 },
   { word: 'Helikopter', emoji: '🚁', syllables: 4 },
-  { word: 'Prinzessin', emoji: '👸', syllables: 3 },
-  { word: 'Ritterburg', emoji: '🏰', syllables: 3 }
+  { word: 'Marienkäfer', emoji: '🐞', syllables: 4 },
+  { word: 'Dinosaurier', emoji: '🦖', syllables: 5 }
 ];
 
 let currentWord = null;
 let currentArcCount = 0;
+let syllablesLocked = false; // verhindert Doppel-Sterne durch mehrfaches Prüfen
 
 const syllableEmojiEl = document.getElementById('syllable-emoji');
 const syllableWordEl = document.getElementById('syllable-word');
@@ -350,6 +355,7 @@ function generateNewWord() {
 }
 
 document.getElementById('btn-add-arc').addEventListener('click', () => {
+  if (syllablesLocked) return;
   if (currentArcCount < 6) {
     currentArcCount++;
     renderArcs();
@@ -357,6 +363,7 @@ document.getElementById('btn-add-arc').addEventListener('click', () => {
 });
 
 document.getElementById('btn-remove-arc').addEventListener('click', () => {
+  if (syllablesLocked) return;
   if (currentArcCount > 0) {
     currentArcCount--;
     renderArcs();
@@ -364,6 +371,7 @@ document.getElementById('btn-remove-arc').addEventListener('click', () => {
 });
 
 document.getElementById('btn-check-syllables').addEventListener('click', async () => {
+  if (syllablesLocked) return;
   if (currentArcCount === 0) {
     feedbackSyllables.textContent = 'Setze zuerst mindestens einen Bogen!';
     feedbackSyllables.style.color = '#e65100';
@@ -371,6 +379,7 @@ document.getElementById('btn-check-syllables').addEventListener('click', async (
   }
 
   if (currentArcCount === currentWord.syllables) {
+    syllablesLocked = true;
     feedbackSyllables.textContent = `🎉 Perfekt! "${currentWord.word}" hat genau ${currentWord.syllables} Silben!`;
     feedbackSyllables.style.color = '#2e7d32';
 
@@ -379,6 +388,7 @@ document.getElementById('btn-check-syllables').addEventListener('click', async (
     renderUI();
 
     setTimeout(() => {
+      syllablesLocked = false;
       generateNewWord();
     }, 1400);
   } else {
@@ -393,12 +403,15 @@ document.getElementById('btn-check-syllables').addEventListener('click', async (
 const scoreDisplay = document.getElementById('score-display');
 const historyList = document.getElementById('history-list');
 
+const MAX_HISTORY_ENTRIES = 50;
+
 async function renderUI() {
   const entries = await getAllEntries();
   scoreDisplay.textContent = entries.length;
   historyList.innerHTML = '';
 
-  const reversed = [...entries].reverse();
+  // Nur die letzten Einträge anzeigen (Sterne-Zähler zählt weiterhin alles)
+  const reversed = [...entries].reverse().slice(0, MAX_HISTORY_ENTRIES);
   for (const entry of reversed) {
     const li = document.createElement('li');
     const dateStr = new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });

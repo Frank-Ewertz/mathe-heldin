@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mathe-heldin-cache-v3';
+const CACHE_NAME = 'lern-heldin-cache-v4';
 const ASSETS = [
   './',
   './index.html',
@@ -33,10 +33,25 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
+// Stale-While-Revalidate: Antworten kommen sofort aus dem Cache,
+// parallel wird der Cache im Hintergrund per Netzwerk aktualisiert.
+// So erhalten Nutzer Updates automatisch, ohne dass die Cache-Version
+// bei jedem Deploy manuell erhöht werden muss.
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      return cachedResponse || fetch(event.request);
+      const networkUpdate = fetch(event.request)
+        .then((response) => {
+          if (response && response.ok &&
+              new URL(event.request.url).origin === self.location.origin) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(() => undefined);
+
+      return cachedResponse || networkUpdate;
     })
   );
 });

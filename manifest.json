@@ -1,10 +1,10 @@
 {
-  "name": "Mathe-Heldin Grundschule",
-  "short_name": "Mathe-Heldin",
+  "name": "Lern-Heldin Grundschule",
+  "short_name": "Lern-Heldin",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#4CAF50",
+  "background_color": "#fff9e6",
+  "theme_color": "#FF9800",
   "icons": [
     {
       "src": "icon-192.png",
