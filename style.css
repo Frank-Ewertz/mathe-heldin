@@ -431,10 +431,151 @@ header h1 {
   100% { transform: translateY(105vh) rotate(720deg); opacity: 0.3; }
 }
 
-/* Drei Modus-Tabs auf kleinen Bildschirmen */
-@media (max-width: 420px) {
+/* ================= ANFANGSSILBEN (TAP-TO-FILL AUSMALEN) ================= */
+.fill-round-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-weight: bold;
+  color: #777;
+  font-size: 0.95rem;
+}
+
+.fill-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.fill-emoji {
+  font-size: 2.6rem;
+  line-height: 1.1;
+  min-width: 58px;
+  text-align: center;
+}
+
+.fill-options {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  flex: 1;
+}
+
+.fill-box {
+  position: relative;
+  overflow: hidden;
+  background-color: #ffffff;
+  border: 2px solid #ffe082;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #e65100;
+  padding: 14px 2px;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.2s ease, color 0.45s ease;
+}
+
+/* Farbfläche zum "Ausmalen": wächst weich von unten hoch */
+.fill-box::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: #a5d6a7;
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.45s ease;
+  z-index: 0;
+}
+
+.fill-box-text {
+  position: relative;
+  z-index: 1;
+}
+
+/* Häkchen oben rechts erscheint nach dem Ausmalen */
+.fill-tick {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 0.8rem;
+  z-index: 1;
+  opacity: 0;
+  transform: scale(0.3);
+  transition: opacity 0.25s ease 0.2s,
+    transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.4) 0.2s;
+}
+
+/* Richtig: Kästchen grün ausgemalt + Häkchen */
+.fill-box.state-correct {
+  border-color: #66bb6a;
+  color: #1b5e20;
+  cursor: default;
+}
+
+.fill-box.state-correct::after {
+  transform: scaleY(1);
+}
+
+.fill-box.state-correct .fill-tick {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Falsch: kurz rot ausgemalt + Wackeln, danach wieder weiß */
+.fill-box.state-wrong {
+  border-color: #e53935;
+  color: #b71c1c;
+  animation: fillShake 0.45s ease;
+}
+
+.fill-box.state-wrong::after {
+  background-color: #ef9a9a;
+  transform: scaleY(1);
+}
+
+@keyframes fillShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+/* Gelöste Zeile: keine Klicks mehr, restliche Kästchen blass */
+.fill-row.solved {
+  pointer-events: none;
+}
+
+.fill-row.solved .fill-box:not(.state-correct) {
+  opacity: 0.4;
+}
+
+/* Vier Modus-Tabs: auf kleinen Bildschirmen 2x2 anordnen */
+@media (max-width: 480px) {
+  .mode-nav {
+    flex-wrap: wrap;
+  }
+
   .nav-btn {
-    font-size: 0.88rem;
-    padding: 10px 4px;
+    flex: 1 1 calc(50% - 5px);
+    font-size: 0.95rem;
+    padding: 10px 6px;
+  }
+
+  .fill-emoji {
+    font-size: 2.1rem;
+    min-width: 46px;
+  }
+
+  .fill-box {
+    font-size: 1.05rem;
+    padding: 10px 2px;
   }
 }

@@ -19,8 +19,9 @@
       <!-- Modus-Auswahl -->
       <nav class="mode-nav">
         <button id="tab-math" class="nav-btn active">➕ Mathe</button>
-        <button id="tab-syllables" class="nav-btn">📖 Silben</button>
+        <button id="tab-syllables" class="nav-btn">📖 Schwingen</button>
         <button id="tab-anlaut" class="nav-btn">🔤 Anlaute</button>
+        <button id="tab-fill" class="nav-btn">✏️ Silben</button>
       </nav>
     </header>
 
@@ -84,6 +85,22 @@
           </div>
 
           <p id="feedback-anlaut" class="feedback-msg" aria-live="polite"></p>
+        </section>
+      </div>
+
+      <!-- ================= 4. ANFANGSSILBEN-BEREICH (AUSMALEN) ================= -->
+      <div id="section-fill" class="mode-section" style="display: none;">
+        <section class="card fill-card">
+          <h2>Male die passende Silbe an!</h2>
+
+          <div class="fill-round-info">
+            <span id="fill-round">Runde 1</span>
+            <span id="fill-progress">0 / 4 Zeilen</span>
+          </div>
+
+          <div id="fill-board"></div>
+
+          <p id="feedback-fill" class="feedback-msg" aria-live="polite"></p>
         </section>
       </div>
 

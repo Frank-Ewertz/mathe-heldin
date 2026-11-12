@@ -92,7 +92,8 @@ async function clearEntries() {
 const MODE_TABS = [
   { tabId: 'tab-math', sectionId: 'section-math' },
   { tabId: 'tab-syllables', sectionId: 'section-syllables' },
-  { tabId: 'tab-anlaut', sectionId: 'section-anlaut' }
+  { tabId: 'tab-anlaut', sectionId: 'section-anlaut' },
+  { tabId: 'tab-fill', sectionId: 'section-fill' }
 ];
 
 MODE_TABS.forEach(({ tabId, sectionId }) => {
@@ -769,6 +770,262 @@ anlautEmojisEl.addEventListener('click', async (e) => {
 });
 
 // ==========================================
+// 6c. ANFANGSSILBEN-DATEN (Silben ausmalen)
+// ==========================================
+// Pool lässt sich leicht erweitern: einfach weitere Objekte ergänzen.
+// { emoji: '🍌', word: 'Banane', base: 'B', syllables: ['Ba', 'Be', 'Bi', 'Bo', 'Bu'], correct: 'Ba' }
+const FILL_DATA = [
+  // B-Silben
+  { emoji: '🍌', word: 'Banane', base: 'B', syllables: ['Ba', 'Be', 'Bi', 'Bo', 'Bu'], correct: 'Ba' },
+  { emoji: '🛏️', word: 'Bett', base: 'B', syllables: ['Ba', 'Be', 'Bi', 'Bo', 'Bu'], correct: 'Be' },
+  { emoji: '🐝', word: 'Biene', base: 'B', syllables: ['Ba', 'Be', 'Bi', 'Bo', 'Bu'], correct: 'Bi' },
+  { emoji: '🫘', word: 'Bohne', base: 'B', syllables: ['Ba', 'Be', 'Bi', 'Bo', 'Bu'], correct: 'Bo' },
+  { emoji: '📚', word: 'Buch', base: 'B', syllables: ['Ba', 'Be', 'Bi', 'Bo', 'Bu'], correct: 'Bu' },
+
+  // D-Silben
+  { emoji: '🏠', word: 'Dach', base: 'D', syllables: ['Da', 'De', 'Di', 'Do', 'Du'], correct: 'Da' },
+  { emoji: '🐬', word: 'Delfin', base: 'D', syllables: ['Da', 'De', 'Di', 'Do', 'Du'], correct: 'De' },
+  { emoji: '💎', word: 'Diamant', base: 'D', syllables: ['Da', 'De', 'Di', 'Do', 'Du'], correct: 'Di' },
+  { emoji: '🥫', word: 'Dose', base: 'D', syllables: ['Da', 'De', 'Di', 'Do', 'Du'], correct: 'Do' },
+  { emoji: '🚿', word: 'Dusche', base: 'D', syllables: ['Da', 'De', 'Di', 'Do', 'Du'], correct: 'Du' },
+
+  // F-Silben
+  { emoji: '🚲', word: 'Fahrrad', base: 'F', syllables: ['Fa', 'Fe', 'Fi', 'Fo', 'Fu'], correct: 'Fa' },
+  { emoji: '🪶', word: 'Feder', base: 'F', syllables: ['Fa', 'Fe', 'Fi', 'Fo', 'Fu'], correct: 'Fe' },
+  { emoji: '🐟', word: 'Fisch', base: 'F', syllables: ['Fa', 'Fe', 'Fi', 'Fo', 'Fu'], correct: 'Fi' },
+  { emoji: '📷', word: 'Foto', base: 'F', syllables: ['Fa', 'Fe', 'Fi', 'Fo', 'Fu'], correct: 'Fo' },
+  { emoji: '🦊', word: 'Fuchs', base: 'F', syllables: ['Fa', 'Fe', 'Fi', 'Fo', 'Fu'], correct: 'Fu' },
+
+  // G-Silben
+  { emoji: '🍴', word: 'Gabel', base: 'G', syllables: ['Ga', 'Ge', 'Gi', 'Go', 'Gu'], correct: 'Ga' },
+  { emoji: '👻', word: 'Gespenst', base: 'G', syllables: ['Ga', 'Ge', 'Gi', 'Go', 'Gu'], correct: 'Ge' },
+  { emoji: '🦒', word: 'Giraffe', base: 'G', syllables: ['Ga', 'Ge', 'Gi', 'Go', 'Gu'], correct: 'Gi' },
+  { emoji: '🦍', word: 'Gorilla', base: 'G', syllables: ['Ga', 'Ge', 'Gi', 'Go', 'Gu'], correct: 'Go' },
+  { emoji: '🥒', word: 'Gurke', base: 'G', syllables: ['Ga', 'Ge', 'Gi', 'Go', 'Gu'], correct: 'Gu' },
+
+  // H-Silben
+  { emoji: '🐰', word: 'Hase', base: 'H', syllables: ['Ha', 'He', 'Hi', 'Ho', 'Hu'], correct: 'Ha' },
+  { emoji: '🧙‍♀️', word: 'Hexe', base: 'H', syllables: ['Ha', 'He', 'Hi', 'Ho', 'Hu'], correct: 'He' },
+  { emoji: '🦌', word: 'Hirsch', base: 'H', syllables: ['Ha', 'He', 'Hi', 'Ho', 'Hu'], correct: 'Hi' },
+  { emoji: '👖', word: 'Hose', base: 'H', syllables: ['Ha', 'He', 'Hi', 'Ho', 'Hu'], correct: 'Ho' },
+  { emoji: '🐶', word: 'Hund', base: 'H', syllables: ['Ha', 'He', 'Hi', 'Ho', 'Hu'], correct: 'Hu' },
+
+  // K-Silben
+  { emoji: '🐱', word: 'Katze', base: 'K', syllables: ['Ka', 'Ke', 'Ki', 'Ko', 'Ku'], correct: 'Ka' },
+  { emoji: '🍪', word: 'Keks', base: 'K', syllables: ['Ka', 'Ke', 'Ki', 'Ko', 'Ku'], correct: 'Ke' },
+  { emoji: '🍒', word: 'Kirsche', base: 'K', syllables: ['Ka', 'Ke', 'Ki', 'Ko', 'Ku'], correct: 'Ki' },
+  { emoji: '🧳', word: 'Koffer', base: 'K', syllables: ['Ka', 'Ke', 'Ki', 'Ko', 'Ku'], correct: 'Ko' },
+  { emoji: '🐄', word: 'Kuh', base: 'K', syllables: ['Ka', 'Ke', 'Ki', 'Ko', 'Ku'], correct: 'Ku' },
+
+  // L-Silben
+  { emoji: '🏮', word: 'Lampe', base: 'L', syllables: ['La', 'Le', 'Li', 'Lo', 'Lu'], correct: 'La' },
+  { emoji: '🪜', word: 'Leiter', base: 'L', syllables: ['La', 'Le', 'Li', 'Lo', 'Lu'], correct: 'Le' },
+  { emoji: '👄', word: 'Lippen', base: 'L', syllables: ['La', 'Le', 'Li', 'Lo', 'Lu'], correct: 'Li' },
+  { emoji: '🚂', word: 'Lokomotive', base: 'L', syllables: ['La', 'Le', 'Li', 'Lo', 'Lu'], correct: 'Lo' },
+  { emoji: '🔎', word: 'Lupe', base: 'L', syllables: ['La', 'Le', 'Li', 'Lo', 'Lu'], correct: 'Lu' },
+
+  // M-Silben
+  { emoji: '🐭', word: 'Maus', base: 'M', syllables: ['Ma', 'Me', 'Mi', 'Mo', 'Mu'], correct: 'Ma' },
+  { emoji: '🍈', word: 'Melone', base: 'M', syllables: ['Ma', 'Me', 'Mi', 'Mo', 'Mu'], correct: 'Me' },
+  { emoji: '🥛', word: 'Milch', base: 'M', syllables: ['Ma', 'Me', 'Mi', 'Mo', 'Mu'], correct: 'Mi' },
+  { emoji: '🌙', word: 'Mond', base: 'M', syllables: ['Ma', 'Me', 'Mi', 'Mo', 'Mu'], correct: 'Mo' },
+  { emoji: '🐚', word: 'Muschel', base: 'M', syllables: ['Ma', 'Me', 'Mi', 'Mo', 'Mu'], correct: 'Mu' },
+
+  // N-Silben
+  { emoji: '👃', word: 'Nase', base: 'N', syllables: ['Na', 'Ne', 'Ni', 'No', 'Nu'], correct: 'Na' },
+  { emoji: '🪹', word: 'Nest', base: 'N', syllables: ['Na', 'Ne', 'Ni', 'No', 'Nu'], correct: 'Ne' },
+  { emoji: '🦛', word: 'Nilpferd', base: 'N', syllables: ['Na', 'Ne', 'Ni', 'No', 'Nu'], correct: 'Ni' },
+  { emoji: '🎵', word: 'Note', base: 'N', syllables: ['Na', 'Ne', 'Ni', 'No', 'Nu'], correct: 'No' },
+  { emoji: '🍝', word: 'Nudel', base: 'N', syllables: ['Na', 'Ne', 'Ni', 'No', 'Nu'], correct: 'Nu' },
+
+  // P-Silben
+  { emoji: '🌴', word: 'Palme', base: 'P', syllables: ['Pa', 'Pe', 'Pi', 'Po', 'Pu'], correct: 'Pa' },
+  { emoji: '🧍', word: 'Person', base: 'P', syllables: ['Pa', 'Pe', 'Pi', 'Po', 'Pu'], correct: 'Pe' },
+  { emoji: '🐧', word: 'Pinguin', base: 'P', syllables: ['Pa', 'Pe', 'Pi', 'Po', 'Pu'], correct: 'Pi' },
+  { emoji: '👮', word: 'Polizei', base: 'P', syllables: ['Pa', 'Pe', 'Pi', 'Po', 'Pu'], correct: 'Po' },
+  { emoji: '🍮', word: 'Pudding', base: 'P', syllables: ['Pa', 'Pe', 'Pi', 'Po', 'Pu'], correct: 'Pu' },
+
+  // R-Silben
+  { emoji: '📻', word: 'Radio', base: 'R', syllables: ['Ra', 'Re', 'Ri', 'Ro', 'Ru'], correct: 'Ra' },
+  { emoji: '🌧️', word: 'Regen', base: 'R', syllables: ['Ra', 'Re', 'Ri', 'Ro', 'Ru'], correct: 'Re' },
+  { emoji: '💍', word: 'Ring', base: 'R', syllables: ['Ra', 'Re', 'Ri', 'Ro', 'Ru'], correct: 'Ri' },
+  { emoji: '🌹', word: 'Rose', base: 'R', syllables: ['Ra', 'Re', 'Ri', 'Ro', 'Ru'], correct: 'Ro' },
+  { emoji: '🎒', word: 'Rucksack', base: 'R', syllables: ['Ra', 'Re', 'Ri', 'Ro', 'Ru'], correct: 'Ru' },
+
+  // S-Silben
+  { emoji: '🥗', word: 'Salat', base: 'S', syllables: ['Sa', 'Se', 'Si', 'So', 'Su'], correct: 'Sa' },
+  { emoji: '🧼', word: 'Seife', base: 'S', syllables: ['Sa', 'Se', 'Si', 'So', 'Su'], correct: 'Se' },
+  { emoji: '🚨', word: 'Sirene', base: 'S', syllables: ['Sa', 'Se', 'Si', 'So', 'Su'], correct: 'Si' },
+  { emoji: '☀️', word: 'Sonne', base: 'S', syllables: ['Sa', 'Se', 'Si', 'So', 'Su'], correct: 'So' },
+  { emoji: '🥣', word: 'Suppe', base: 'S', syllables: ['Sa', 'Se', 'Si', 'So', 'Su'], correct: 'Su' },
+
+  // T-Silben
+  { emoji: '🌲', word: 'Tanne', base: 'T', syllables: ['Ta', 'Te', 'Ti', 'To', 'Tu'], correct: 'Ta' },
+  { emoji: '☎️', word: 'Telefon', base: 'T', syllables: ['Ta', 'Te', 'Ti', 'To', 'Tu'], correct: 'Te' },
+  { emoji: '🐯', word: 'Tiger', base: 'T', syllables: ['Ta', 'Te', 'Ti', 'To', 'Tu'], correct: 'Ti' },
+  { emoji: '🍅', word: 'Tomate', base: 'T', syllables: ['Ta', 'Te', 'Ti', 'To', 'Tu'], correct: 'To' },
+  { emoji: '🌷', word: 'Tulpe', base: 'T', syllables: ['Ta', 'Te', 'Ti', 'To', 'Tu'], correct: 'Tu' },
+
+  // W-Silben
+  { emoji: '⚖️', word: 'Waage', base: 'W', syllables: ['Wa', 'We', 'Wi', 'Wo', 'Wu'], correct: 'Wa' },
+  { emoji: '⏰', word: 'Wecker', base: 'W', syllables: ['Wa', 'We', 'Wi', 'Wo', 'Wu'], correct: 'We' },
+  { emoji: '🏞️', word: 'Wiese', base: 'W', syllables: ['Wa', 'We', 'Wi', 'Wo', 'Wu'], correct: 'Wi' },
+  { emoji: '☁️', word: 'Wolke', base: 'W', syllables: ['Wa', 'We', 'Wi', 'Wo', 'Wu'], correct: 'Wo' },
+  { emoji: '🐛', word: 'Wurm', base: 'W', syllables: ['Wa', 'We', 'Wi', 'Wo', 'Wu'], correct: 'Wu' },
+
+  // Z-Silben
+  { emoji: '🦷', word: 'Zahn', base: 'Z', syllables: ['Za', 'Ze', 'Zi', 'Zo', 'Zu'], correct: 'Za' },
+  { emoji: '🦓', word: 'Zebra', base: 'Z', syllables: ['Za', 'Ze', 'Zi', 'Zo', 'Zu'], correct: 'Ze' },
+  { emoji: '🍋', word: 'Zitrone', base: 'Z', syllables: ['Za', 'Ze', 'Zi', 'Zo', 'Zu'], correct: 'Zi' },
+  { emoji: '🦁', word: 'Zoo', base: 'Z', syllables: ['Za', 'Ze', 'Zi', 'Zo', 'Zu'], correct: 'Zo' },
+  { emoji: '🚂', word: 'Zug', base: 'Z', syllables: ['Za', 'Ze', 'Zi', 'Zo', 'Zu'], correct: 'Zu' }
+];
+
+// ==========================================
+// 6d. ANFANGSSILBEN-LOGIK (Tap-to-Fill Ausmalen)
+// ==========================================
+// Rundenbasiert: Pro Runde 4-5 zufällige Zeilen (jedes Emoji nur einmal).
+// Pro Zeile: Emoji links, rechts 5 Silben-Kästchen. Das Kind tippt die
+// richtige Anfangssilbe an -> das Kästchen "malt sich aus".
+const FILL_MIN_ROWS = 4;
+const FILL_MAX_ROWS = 5;
+
+const fillBoardEl = document.getElementById('fill-board');
+const fillRoundEl = document.getElementById('fill-round');
+const fillProgressEl = document.getElementById('fill-progress');
+const feedbackFill = document.getElementById('feedback-fill');
+
+let fillRoundRows = [];
+let fillSolvedCount = 0;
+let fillRoundNo = 1;
+let fillLocked = false; // blockiert Klicks während des Rundenwechsels
+
+function drawFillRows() {
+  const rowCount = FILL_MIN_ROWS +
+    Math.floor(Math.random() * (FILL_MAX_ROWS - FILL_MIN_ROWS + 1)); // 4 oder 5
+  const pool = shuffleArray(FILL_DATA);
+  const chosen = [];
+  const usedEmojis = new Set();
+
+  for (const entry of pool) {
+    if (chosen.length >= rowCount) break;
+    if (!usedEmojis.has(entry.emoji)) {
+      usedEmojis.add(entry.emoji);
+      chosen.push(entry);
+    }
+  }
+
+  return chosen;
+}
+
+function createFillRow(entry, index) {
+  const row = document.createElement('div');
+  row.className = 'fill-row';
+  row.dataset.index = index;
+
+  // Ganz links: großes Emoji
+  const emoji = document.createElement('span');
+  emoji.className = 'fill-emoji';
+  emoji.textContent = entry.emoji;
+  row.appendChild(emoji);
+
+  // Rechts daneben: 5 Silben-Kästchen
+  const options = document.createElement('div');
+  options.className = 'fill-options';
+  entry.syllables.forEach((syl) => {
+    const box = document.createElement('button');
+    box.type = 'button';
+    box.className = 'fill-box';
+    box.dataset.syllable = syl;
+
+    const text = document.createElement('span');
+    text.className = 'fill-box-text';
+    text.textContent = syl;
+    box.appendChild(text);
+
+    const tick = document.createElement('span');
+    tick.className = 'fill-tick';
+    tick.textContent = '✔️';
+    box.appendChild(tick);
+
+    options.appendChild(box);
+  });
+  row.appendChild(options);
+
+  return row;
+}
+
+function renderFillBoard() {
+  fillBoardEl.innerHTML = '';
+  fillRoundRows.forEach((entry, index) => {
+    fillBoardEl.appendChild(createFillRow(entry, index));
+  });
+
+  fillRoundEl.textContent = `Runde ${fillRoundNo}`;
+  fillProgressEl.textContent = `0 / ${fillRoundRows.length} Zeilen`;
+}
+
+function startFillRound() {
+  fillRoundRows = drawFillRows();
+  fillSolvedCount = 0;
+  fillLocked = false;
+  feedbackFill.textContent = '';
+  renderFillBoard();
+}
+
+// Silben-Kästchen antippen -> ausmalen & prüfen
+fillBoardEl.addEventListener('click', async (e) => {
+  const box = e.target.closest('.fill-box');
+  if (!box || fillLocked) return;
+
+  const row = box.closest('.fill-row');
+  if (!row || row.classList.contains('solved')) return;
+  if (row.dataset.rowLocked === 'true') return; // Zeile kurz nach Fehler gesperrt
+
+  const entry = fillRoundRows[parseInt(row.dataset.index, 10)];
+
+  if (box.dataset.syllable === entry.correct) {
+    // RICHTIG: Kästchen füllt sich grün, Häkchen erscheint,
+    // restliche Kästchen der Zeile werden deaktiviert
+    row.classList.add('solved');
+    box.classList.add('state-correct');
+    fillSolvedCount++;
+
+    feedbackFill.textContent = `✅ ${entry.word} beginnt mit ${entry.correct}!`;
+    feedbackFill.style.color = '#2e7d32';
+    fillProgressEl.textContent = `${fillSolvedCount} / ${fillRoundRows.length} Zeilen`;
+
+    await addEntry(`Anfangssilbe: ${entry.word} → ${entry.correct} ⭐`);
+    renderUI();
+
+    if (fillSolvedCount === fillRoundRows.length) {
+      // Runde geschafft: Konfetti + nach 3 Sekunden neue Runde
+      fillLocked = true;
+      showConfetti();
+      feedbackFill.textContent = '🎉 Super! Alle Silben richtig ausgemalt!';
+      feedbackFill.style.color = '#2e7d32';
+
+      setTimeout(() => {
+        fillRoundNo++;
+        startFillRound();
+      }, 3000);
+    }
+  } else {
+    // FALSCH: Kästchen füllt sich kurz rot, wackelt und wird wieder weiß
+    row.dataset.rowLocked = 'true';
+    box.classList.add('state-wrong');
+
+    feedbackFill.textContent = '🤔 Sprich das Wort noch einmal langsam!';
+    feedbackFill.style.color = '#d32f2f';
+
+    setTimeout(() => {
+      box.classList.remove('state-wrong');
+      row.dataset.rowLocked = 'false';
+    }, 700);
+  }
+});
+
+// ==========================================
 // 7. UI & RESET
 // ==========================================
 const scoreDisplay = document.getElementById('score-display');
@@ -804,3 +1061,4 @@ buildNumberPad();
 generateNewTask();
 generateNewWord();
 startAnlautRound();
+startFillRound();
